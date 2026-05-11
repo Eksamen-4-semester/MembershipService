@@ -2,10 +2,10 @@
 
 namespace MembershipAPI.Models;
 
-public class Subscription
+public class AddOn
 {
     [BsonId]
-    public int SubscriptionId { get; set; }
+    public int AddOnId { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }
 }
