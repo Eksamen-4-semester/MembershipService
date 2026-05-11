@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MembershipAPI.UnitTest/MembershipAPI.UnitTest.csproj" />
+  <Project Path="MembershipAPI/MembershipAPI.csproj" />
+</Solution>
