@@ -1,7 +1,9 @@
 ﻿using MembershipAPI.Models;
 using MembershipAPI.Models.DTOs;
 using MembershipAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VaultSharp.V1.SecretsEngines.Database;
 
 namespace MembershipAPI.Controllers;
 
@@ -23,6 +25,7 @@ public class AddOnController : ControllerBase
         _memberSubscriptionRepository = memberSubscriptionRepository;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [Route("create")]
     public async Task<IActionResult> CreateAddOn(AddOnDto addOnDto)
@@ -44,7 +47,7 @@ public class AddOnController : ControllerBase
         }
         return Created();
     }
-
+    
     [HttpGet]
     public async Task<IActionResult> GetAllAddOns()
     {
@@ -56,6 +59,7 @@ public class AddOnController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
     [HttpPost]
     [Route("{memberSubscriptionId:int}")]
     public async Task<IActionResult> RegisterAddOnToMemberSubscription(int memberSubscriptionId, [FromBody]SubscriptionAddOnDto addOnDto)

@@ -20,6 +20,7 @@ public class MemberSubscriptionController : ControllerBase
         _memberSubscriptionRepository = memberSubscriptionRepository;
     }
 
+    [Authorize]
     [HttpGet]
     [Route("{memberId:int}")]
     public async Task<IActionResult> GetMemberSubscriptionAsync(int memberId)
@@ -37,6 +38,7 @@ public class MemberSubscriptionController : ControllerBase
         return Ok(result);
     }
     
+    [Authorize]
     [HttpPost]
     [Route("create")]
     public async Task<IActionResult> CreateMemberSubscription([FromBody] MemberSubscriptionDto memberSubscription)

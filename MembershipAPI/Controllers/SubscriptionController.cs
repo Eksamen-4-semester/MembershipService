@@ -27,6 +27,7 @@ public class SubscriptionController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles = "Admin,Trainer")]
     [HttpPost]
     [Route("create")]
     public async Task<IActionResult> CreateSubscription([FromBody] SubscriptionDto subscription)
