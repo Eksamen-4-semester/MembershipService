@@ -22,19 +22,39 @@ public class AddOnRepositoryMongoDb : IAddOnRepository
         _memberSubscriptionCollection = database.GetCollection<MemberSubscription>("MemberSubscription");
     }
     
-    public Task<bool> CreateAddOnAsync(AddOnDto addOn)
+    public async Task<bool> CreateAddOnAsync(AddOnDto addOn)
     {
-        throw new NotImplementedException();
+        var maxId = await GetMaxAddOnId() + 1;
+        var add = new AddOn()
+        {
+            AddOnId = maxId,
+            Name = addOn.Name,
+            Price = addOn.Price
+        };
+        
+        try
+        {
+            await _addOnCollection.InsertOneAsync(add);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
-    public Task<bool> DeleteAddOnAsync(int addOnId)
+    public async Task<bool> DeleteAddOnAsync(int addOnId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<AddOn>.Filter.Eq("_id", addOnId);
+        var res = await _addOnCollection.DeleteOneAsync(filter);
+        return res.DeletedCount > 0;
     }
 
-    public Task<AddOn?> GetAddOnByIdAsync(int addOnId)
+    public async Task<AddOn?> GetAddOnByIdAsync(int addOnId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<AddOn>.Filter.Eq("_id", addOnId);
+        return await _addOnCollection.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<MemberAddOns?> GetSubscriptionAddOnsAsync(int memberSubscriptionId)
@@ -43,17 +63,15 @@ public class AddOnRepositoryMongoDb : IAddOnRepository
         return await _memberAddOnCollection.Find(filter).FirstOrDefaultAsync();
     }
 
+    public async Task<List<AddOn>?> GetAllAddOnsAsync()
+    {
+        var filter = Builders<AddOn>.Filter.Empty; 
+        return await _addOnCollection.Find(filter).ToListAsync();
+    }
+
     public async Task<bool> AssignAddOnsToMemberSubscriptionAsync(int memberSubscriptionId, List<int> addOnId)
     {
-        var totalAddOnPrice = 0;
-        foreach (var id in addOnId)
-        {
-            var exists = await AddOnExistsAsync(id);
-            if (!exists)
-                return false;
-        }
-        
-        var newMax = await GetMaxMemberAddOnId();
+        var newMax = await GetMaxMemberAddOnId() + 1;
         var newMemberAddOn = new MemberAddOns()
         {
             MemberAddOnId = newMax,
@@ -75,13 +93,6 @@ public class AddOnRepositoryMongoDb : IAddOnRepository
 
     public async Task<bool> RemoveAddOnsFromMemberSubscriptionAsync(int memberSubscriptionId, List<int> addOnId)
     {
-        foreach (var id in addOnId)
-        {
-            var exists = await AddOnExistsAsync(id);
-            if (!exists)
-                return false;
-        }
-        
         var currentMemberSubscriptionAddOns = await GetSubscriptionAddOnsAsync(memberSubscriptionId);
         if (currentMemberSubscriptionAddOns == null)
             return false;
@@ -104,11 +115,16 @@ public class AddOnRepositoryMongoDb : IAddOnRepository
         }
     }
 
-    private async Task<bool> AddOnExistsAsync(int addOnId)
+    public async Task<bool> AddOnsExistsAsync(List<int> addOnIds)
     {
-        var filter = Builders<AddOn>.Filter.Eq("_id", addOnId);
-        var result = await _addOnCollection.Find(filter).FirstOrDefaultAsync();
-        return result != null;
+        foreach (var id in addOnIds)
+        {
+            var filter = Builders<AddOn>.Filter.Eq("_id", id);
+            var result = await _addOnCollection.Find(filter).FirstOrDefaultAsync();
+            if (result == null)
+                return false;
+        }
+        return true;
     }
     
     private async Task<int> GetMaxAddOnId()

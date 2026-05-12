@@ -8,7 +8,6 @@ public class MemberSubscription
     public int MemberSubscriptionId { get; set; }
     public int SubscriptionId { get; set; }
     public int MemberId { get; set; }
-    public decimal TotalSubscriptionPrice { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
 }
 

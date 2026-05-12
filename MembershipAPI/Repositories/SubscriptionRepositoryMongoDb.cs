@@ -7,9 +7,35 @@ namespace MembershipAPI.Repositories;
 
 public class SubscriptionRepositoryMongoDb : ISubscriptionRepository
 {
-    public Task<bool> CreateNewSubscriptionAsync(SubscriptionDto subscription)
+    IMongoCollection<Subscription> _subcriptionCollection;
+    ILogger<SubscriptionRepositoryMongoDb> _logger;
+    public SubscriptionRepositoryMongoDb(
+        ILogger<SubscriptionRepositoryMongoDb> logger,
+        IMongoDatabase database)
     {
-        throw new NotImplementedException();
+        _logger = logger;
+        _subcriptionCollection = database.GetCollection<Subscription>("Subscription");
+    }
+    
+    public async Task<bool> CreateNewSubscriptionAsync(SubscriptionDto subscription)
+    {
+        try
+        {
+            var newMax = await GetMaxId() + 1;
+            var newSub = new Subscription()
+            {
+                SubscriptionId = newMax,
+                Name = subscription.Name,
+                Price = subscription.Price,
+            };
+            await _subcriptionCollection.InsertOneAsync(newSub);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
     public Task<bool> UpdateSubscriptionAsync(UpdateSubscriptionDto subscription)
@@ -22,14 +48,16 @@ public class SubscriptionRepositoryMongoDb : ISubscriptionRepository
         throw new NotImplementedException();
     }
 
-    public Task<Subscription?> GetSubscriptionByIdAsync(int subscriptionId)
+    public async Task<Subscription?> GetSubscriptionByIdAsync(int subscriptionId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<Subscription>.Filter.Eq("_id", subscriptionId);
+        return await _subcriptionCollection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public Task<List<Subscription>> GetAllSubscriptionsAsync()
+    public async Task<List<Subscription>?> GetAllSubscriptionsAsync()
     {
-        throw new NotImplementedException();
+        var filter = Builders<Subscription>.Filter.Empty;
+        return await _subcriptionCollection.Find(filter).ToListAsync();
     }
     
     private async Task<int> GetMaxId()
@@ -38,11 +66,11 @@ public class SubscriptionRepositoryMongoDb : ISubscriptionRepository
         
         try
         {
-            var filter = Builders<MemberSubscription>.Filter.Empty;
-            var sort = Builders<MemberSubscription>.Sort.Descending("_id");
+            var filter = Builders<Subscription>.Filter.Empty;
+            var sort = Builders<Subscription>.Sort.Descending("_id");
         
-            var result = await _memberSubscriptionCollection.Find(filter).Sort(sort).Limit(1).FirstOrDefaultAsync();
-            var maxId = result?.MemberSubscriptionId ?? 0;
+            var result = await _subcriptionCollection.Find(filter).Sort(sort).Limit(1).FirstOrDefaultAsync();
+            var maxId = result?.SubscriptionId ?? 0;
 
             _logger.LogDebug(
                 "GetMaxId returned {MaxId} from Subscription collection",

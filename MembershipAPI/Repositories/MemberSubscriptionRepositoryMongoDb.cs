@@ -20,26 +20,27 @@ public class MemberSubscriptionRepositoryMongoDb : IMemberSubscriptionRepository
         _memberAddOnCollection = database.GetCollection<MemberAddOns>("MemberAddOn");
     }
     
-    public Task<MemberSubscription?> GetMemberSubscriptionByMemberIdAsync(string memberId)
+    public async Task<MemberSubscription?> GetMemberSubscriptionByMemberIdAsync(int memberId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<MemberSubscription>.Filter.Eq("MemberId", memberId);
+        return await _memberSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public Task<MemberSubscription?> GetMemberSubscriptionByIdAsync(int memberSubscriptionId)
+    public async Task<MemberSubscription?> GetMemberSubscriptionByIdAsync(int memberSubscriptionId)
     {
-        throw new NotImplementedException();
+        var filter = Builders<MemberSubscription>.Filter.Eq("_id", memberSubscriptionId);
+        return await _memberSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<bool> CreateMemberSubscriptionAsync(MemberSubscriptionDto memberSubscription)
     {
-        var newMax = await GetMaxId();
+        var newMax = await GetMaxId() + 1;
         var subscription = new MemberSubscription()
         {
             MemberSubscriptionId = newMax,
             MemberId = memberSubscription.MemberId,
             SubscriptionId = memberSubscription.SubscriptionId,
             PaymentStatus = PaymentStatus.NotPayed,
-            TotalSubscriptionPrice = memberSubscription.TotalPrice,
         };
         try
         {

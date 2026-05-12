@@ -1,3 +1,5 @@
+using MembershipAPI.Repositories;
+using MembershipAPI.Repositories.Interfaces;
 using MongoDB.Driver;
 using NLog;
 using NLog.Web;
@@ -73,14 +75,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddHttpClient("authService", client =>
-{
-    var authServiceUrl = Environment.GetEnvironmentVariable("AUTHSERVICE_URL"); 
-    if (string.IsNullOrWhiteSpace(authServiceUrl))
-        Console.WriteLine("Environment variable AUTHSERVICE_URL is not set, using localhost variable instead");
-    client.BaseAddress = new Uri(authServiceUrl ?? "http://localhost:5028/");
-});
-
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -105,7 +99,9 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
     return mongoClient.GetDatabase(databaseName);
 });
 
-// TODO Her skal repositories sættes som singletons eller scoped
+builder.Services.AddSingleton<IAddOnRepository, AddOnRepositoryMongoDb>();
+builder.Services.AddSingleton<IMemberSubscriptionRepository, MemberSubscriptionRepositoryMongoDb>();
+builder.Services.AddSingleton<ISubscriptionRepository, SubscriptionRepositoryMongoDb>();
 
 var app = builder.Build();
 

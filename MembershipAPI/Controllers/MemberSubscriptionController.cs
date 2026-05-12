@@ -20,13 +20,29 @@ public class MemberSubscriptionController : ControllerBase
         _memberSubscriptionRepository = memberSubscriptionRepository;
     }
 
-    // Membersubscription.TotalPrice skal være den totale pris inkluderet alle 'add-ons'
+    [HttpGet]
+    [Route("{memberId:int}")]
+    public async Task<IActionResult> GetMemberSubscriptionAsync(int memberId)
+    {
+        if (memberId <= 0)
+        {
+            return BadRequest("Invalid member id");
+        }
+        var result = await _memberSubscriptionRepository.GetMemberSubscriptionByMemberIdAsync(memberId);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(result);
+    }
+    
     [HttpPost]
+    [Route("create")]
     public async Task<IActionResult> CreateMemberSubscription([FromBody] MemberSubscriptionDto memberSubscription)
     {
         if (memberSubscription.MemberId <= 0
-            || memberSubscription.SubscriptionId <= 0
-            || memberSubscription.TotalPrice <= 0)
+            || memberSubscription.SubscriptionId <= 0)
         {
             return BadRequest("Invalid member id, subscription id or total price");
         }

@@ -9,6 +9,8 @@ public interface IAddOnRepository
     Task<bool> DeleteAddOnAsync(int addOnId);
     Task<AddOn?> GetAddOnByIdAsync(int addOnId);
     Task<MemberAddOns?> GetSubscriptionAddOnsAsync(int memberSubscriptionId);
+    Task<bool> AddOnsExistsAsync(List<int> addOnIds);
+    Task<List<AddOn>?> GetAllAddOnsAsync();
     
     Task<bool> AssignAddOnsToMemberSubscriptionAsync(int memberSubscriptionId, List<int> addOnId);
     Task<bool> RemoveAddOnsFromMemberSubscriptionAsync(int memberSubscriptionId, List<int> addOnId);

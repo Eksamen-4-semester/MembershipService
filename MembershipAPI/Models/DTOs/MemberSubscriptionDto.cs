@@ -1,3 +1,3 @@
 ﻿namespace MembershipAPI.Models.DTOs;
 
-public record MemberSubscriptionDto(int MemberId, int SubscriptionId, decimal TotalPrice);
+public record MemberSubscriptionDto(int MemberId, int SubscriptionId);
