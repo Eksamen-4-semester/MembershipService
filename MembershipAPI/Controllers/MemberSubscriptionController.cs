@@ -52,7 +52,10 @@ public class MemberSubscriptionController : ControllerBase
     {
         var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim == null)
+        {
+            _logger.LogError("MemberId claim not found in token");
             return Unauthorized();
+        }
         
         var memberId = int.Parse(userIdClaim.Value);
         
