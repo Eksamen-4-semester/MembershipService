@@ -27,14 +27,20 @@ public class MemberSubscriptionController : ControllerBase
     public async Task<IActionResult> GetMemberSubscriptionAsync(int memberId)
     {
         if (memberId <= 0)
-        {
             return BadRequest("Invalid member id");
+        
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        var isAdminOrTrainer = User.IsInRole("Admin") || User.IsInRole("Trainer");
+        
+        if (!isAdminOrTrainer && userIdClaim != null && memberId != int.Parse(userIdClaim.Value))
+        {
+            _logger.LogInformation("Member {MemberId} tried to access subscription for member {TargetMemberId}", userIdClaim.Value, memberId);
+            return Forbid();
         }
+        
         var result = await _memberSubscriptionRepository.GetMemberSubscriptionByMemberIdAsync(memberId);
         if (result == null)
-        {
             return NotFound();
-        }
         
         return Ok(result);
     }
