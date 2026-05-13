@@ -99,9 +99,9 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
     return mongoClient.GetDatabase(databaseName);
 });
 
-builder.Services.AddSingleton<IAddOnRepository, AddOnRepositoryMongoDb>();
-builder.Services.AddSingleton<IMemberSubscriptionRepository, MemberSubscriptionRepositoryMongoDb>();
-builder.Services.AddSingleton<ISubscriptionRepository, SubscriptionRepositoryMongoDb>();
+builder.Services.AddScoped<IAddOnRepository, AddOnRepositoryMongoDb>();
+builder.Services.AddScoped<IMemberSubscriptionRepository, MemberSubscriptionRepositoryMongoDb>();
+builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepositoryMongoDb>();
 
 var app = builder.Build();
 
