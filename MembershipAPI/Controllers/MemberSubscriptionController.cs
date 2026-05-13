@@ -1,4 +1,5 @@
-﻿using MembershipAPI.Models.DTOs;
+﻿using System.Security.Claims;
+using MembershipAPI.Models.DTOs;
 using MembershipAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,17 +44,22 @@ public class MemberSubscriptionController : ControllerBase
     [Route("create")]
     public async Task<IActionResult> CreateMemberSubscription([FromBody] MemberSubscriptionDto memberSubscription)
     {
-        if (memberSubscription.MemberId <= 0
-            || memberSubscription.SubscriptionId <= 0)
-        {
-            return BadRequest("Invalid member id, subscription id or total price");
-        }
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized();
         
-        var res = await _memberSubscriptionRepository.MemberAlreadyHasSubscriptionAsync(memberSubscription.MemberId);
+        var memberId = int.Parse(userIdClaim.Value);
+        
+        if (memberSubscription.SubscriptionId <= 0)
+            return BadRequest("Invalid subscription id");
+        
+        var res = await _memberSubscriptionRepository.MemberAlreadyHasSubscriptionAsync(memberId);
         if (res)
             return Conflict("Member already has a Subscription");
         
-        var subscriptionResult = await _memberSubscriptionRepository.CreateMemberSubscriptionAsync(memberSubscription);
+        var subscription = new MemberSubscriptionDto(memberId, memberSubscription.SubscriptionId);
+        
+        var subscriptionResult = await _memberSubscriptionRepository.CreateMemberSubscriptionAsync(subscription);
         if (!subscriptionResult)
             return BadRequest("Subscription could not be created");
         return Created();
