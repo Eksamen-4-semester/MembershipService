@@ -42,12 +42,12 @@ public class SubscriptionController : ControllerBase
     {
         if (subscription.Price <= 0)
         {
-            return BadRequest("Price must be positive");
+            return BadRequest("Price must be greater than 0");
         }
 
         if (string.IsNullOrWhiteSpace(subscription.Name))
         {
-            return BadRequest("Name is required");
+            return BadRequest("Name for subscription is required");
         }
         
         var created = await _subscriptionRepository.CreateNewSubscriptionAsync(subscription);
@@ -55,7 +55,6 @@ public class SubscriptionController : ControllerBase
         {
             return StatusCode(500);
         }
-
         return Created();
     }
     
