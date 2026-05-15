@@ -26,6 +26,14 @@ public class SubscriptionController : ControllerBase
         var result = await _subscriptionRepository.GetAllSubscriptionsAsync();
         return Ok(result);
     }
+    
+    [HttpGet]
+    [Route("{subscriptionId:int}")]
+    public async Task<IActionResult> GetSubscriptionById(int subscriptionId)
+    {
+        var result = await _subscriptionRepository.GetSubscriptionByIdAsync(subscriptionId);
+        return Ok(result);
+    }
 
     [Authorize(Roles = "Admin,Trainer")]
     [HttpPost]
