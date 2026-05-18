@@ -39,6 +39,11 @@ public class AddOnController : ControllerBase
         {
             return BadRequest("Name is required");
         }
+
+        if (string.IsNullOrWhiteSpace(addOnDto.Description))
+        {
+            return BadRequest("Description is required");
+        }
         
         var result = await _addOnRepository.CreateAddOnAsync(addOnDto);
         if (!result)

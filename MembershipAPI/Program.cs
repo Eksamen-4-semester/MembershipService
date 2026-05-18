@@ -1,4 +1,5 @@
 using System.Text;
+using MembershipAPI.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MembershipAPI.Repositories;
@@ -130,6 +131,13 @@ builder.Services.AddScoped<IMemberSubscriptionRepository, MemberSubscriptionRepo
 builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepositoryMongoDb>();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var database = scope.ServiceProvider
+        .GetRequiredService<IMongoDatabase>();
+
+    await SeedData.SeedDatabase(database);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

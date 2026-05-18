@@ -24,6 +24,10 @@ public class SubscriptionController : ControllerBase
     public async Task<IActionResult> GetAllSubscriptions()
     {
         var result = await _subscriptionRepository.GetAllSubscriptionsAsync();
+        if (result is null)
+        {
+            return NotFound();
+        }
         return Ok(result);
     }
     
@@ -48,6 +52,11 @@ public class SubscriptionController : ControllerBase
         if (string.IsNullOrWhiteSpace(subscription.Name))
         {
             return BadRequest("Name for subscription is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(subscription.Description))
+        {
+            return BadRequest("Description for subscription is required");
         }
         
         var created = await _subscriptionRepository.CreateNewSubscriptionAsync(subscription);

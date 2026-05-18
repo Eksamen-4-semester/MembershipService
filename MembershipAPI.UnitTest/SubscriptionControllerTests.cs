@@ -28,7 +28,7 @@ public sealed class SubscriptionControllerTests
         // Arrange
         _subscriptionRepositoryMock.Setup(r => r.CreateNewSubscriptionAsync(It.IsAny<SubscriptionDto>()))
             .ReturnsAsync(true);
-        var subscriptionDto = new SubscriptionDto("Student-Subscription", 50.99M);
+        var subscriptionDto = new SubscriptionDto("Student-Subscription", 50.99M, "Den rigtige løsning for dig, som træner og bla bla bla");
         
         // Act
         var result = await _subscriptionController.CreateSubscription(subscriptionDto);
@@ -41,7 +41,7 @@ public sealed class SubscriptionControllerTests
     public async Task CreateSubscription_Returns_BadRequestObjectResult_When_Price_Equal_Zero()
     {
         // Arrange
-        var subscriptionDto = new SubscriptionDto("Student-Subscription", 0);
+        var subscriptionDto = new SubscriptionDto("Student-Subscription", 0, "SLkfjsdlkfjsdlkfjslkfjsdklf");
         
         // Act
         var result = await _subscriptionController.CreateSubscription(subscriptionDto);
@@ -54,7 +54,7 @@ public sealed class SubscriptionControllerTests
     public async Task CreateSubscription_Returns_BadRequestObjectResult_When_Name_Is_Null()
     {
         // Arrange
-        var subscriptionDto = new SubscriptionDto(null, 250);
+        var subscriptionDto = new SubscriptionDto(null, 250, "LSKDjflksdjflksdjflksjflksjdf");
         
         // Act
         var result = await _subscriptionController.CreateSubscription(subscriptionDto);
@@ -69,7 +69,7 @@ public sealed class SubscriptionControllerTests
         // Arrange
         _subscriptionRepositoryMock.Setup(r => r.CreateNewSubscriptionAsync(It.IsAny<SubscriptionDto>()))
             .ReturnsAsync(false);
-        var subscriptionDto = new SubscriptionDto("Elder-Subscription", 23.95M);
+        var subscriptionDto = new SubscriptionDto("Elder-Subscription", 23.95M, "LSKFjlksfjklsfjlsfjsdlfj");
         
         // Act
         var result = await _subscriptionController.CreateSubscription(subscriptionDto);
